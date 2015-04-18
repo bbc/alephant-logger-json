@@ -12,6 +12,7 @@ describe Alephant::Logger::JSON do
 
   before do
     allow(File).to receive(:open) { log_file }
+    allow(log_file).to receive :sync= 
   end
 
   shared_examples "JSON logging" do

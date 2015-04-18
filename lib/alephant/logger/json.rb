@@ -5,6 +5,7 @@ module Alephant
     class JSON
       def initialize(log_path)
         @log_file = File.open(log_path, "a+")
+        @log_file.sync = true
       end
 
       [:debug, :info, :warn, :error].each do |level|
