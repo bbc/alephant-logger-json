@@ -10,7 +10,7 @@ module Alephant
 
       [:debug, :info, :warn, :error].each do |level|
         define_method(level) do |hash|
-          hash["level"] = level
+          hash["level"] = level.to_s
           @log_file.write(::JSON.generate(hash) + "\n")
         end
       end
