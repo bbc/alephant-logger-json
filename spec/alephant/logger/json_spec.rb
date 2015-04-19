@@ -29,10 +29,52 @@ describe Alephant::Logger::JSON do
     end
   end
 
-  describe "log levels" do
-    %w[debug info warn error].each do |level|
-      it_behaves_like "JSON logging" do
-        let(:level) { level }
+  shared_context "nested log hash" do
+    let(:log_hash) do
+      { "nest" => nest }
+    end
+
+    let(:nest) { { "bird" => "eggs" } }
+  end
+
+  shared_examples "nests flattened to strings" do
+    include_context "nested log hash"
+
+    specify do
+      expect(log_file).to receive(:write) do |json_dump|
+        expect(JSON.parse(json_dump)["nest"]).to eq nest.to_s
+      end
+
+      subject.send(level, log_hash)
+    end
+  end
+
+  shared_examples "nesting allowed" do
+    include_context "nested log hash"
+
+    specify do
+      expect(log_file).to receive(:write) do |json_dump|
+        expect(JSON.parse json_dump).to eq log_hash
+      end
+
+      subject.send(level, log_hash)
+    end
+  end
+
+  %w[debug info warn error].each do |level|
+    describe "##{level}" do
+      let(:level) { level }
+
+      it_behaves_like "JSON logging"
+
+      it_behaves_like "nests flattened to strings"
+
+      context "with nesting allowed" do
+        subject do
+          described_class.new(log_path, :nesting => true)
+        end
+
+        it_behaves_like "nesting allowed"
       end
     end
   end
