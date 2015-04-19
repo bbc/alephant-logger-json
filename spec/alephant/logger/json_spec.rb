@@ -63,22 +63,18 @@ describe Alephant::Logger::JSON do
 
   %w[debug info warn error].each do |level|
     describe "##{level}" do
-      it_behaves_like "JSON logging" do
-        let(:level) { level }
-      end
+      let(:level) { level }
 
-      it_behaves_like "nests flattened to strings" do
-        let(:level) { level }
-      end
+      it_behaves_like "JSON logging"
+
+      it_behaves_like "nests flattened to strings"
 
       context "with nesting allowed" do
         subject do
           described_class.new(log_path, true)
         end
 
-        it_behaves_like "nesting allowed" do
-          let(:level) { level }
-        end
+        it_behaves_like "nesting allowed"
       end
     end
   end
