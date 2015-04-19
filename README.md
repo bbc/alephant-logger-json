@@ -30,6 +30,13 @@ logger = Alephant::Logger.setup json_driver
 logger.info({ "some_field" => "some_value", "other_field" => "other_value" })
 ```
 
+By default, nested JSON values are flattened to strings.  To enable nesting,
+provided that your log analysis tooling supports that, create
+`Alephant::Logger::JSON` as follows:
+```
+Alephant::Logger::JSON.new("path/to/logfile.log", :nesting => true)
+```
+
 ## Contributing
 
 1. Fork it ( https://github.com/BBC-News/alephant-logger-json/fork )
