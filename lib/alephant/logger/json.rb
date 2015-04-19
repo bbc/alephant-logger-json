@@ -6,7 +6,7 @@ module Alephant
       def initialize(log_path, options = {})
         @log_file = File.open(log_path, "a+")
         @log_file.sync = true
-        @nesting = options.fetch(:nesting) { false }
+        @nesting = options.fetch(:nesting, false)
       end
 
       private
