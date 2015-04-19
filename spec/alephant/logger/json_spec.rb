@@ -71,7 +71,7 @@ describe Alephant::Logger::JSON do
 
       context "with nesting allowed" do
         subject do
-          described_class.new(log_path, true)
+          described_class.new(log_path, :nesting => true)
         end
 
         it_behaves_like "nesting allowed"

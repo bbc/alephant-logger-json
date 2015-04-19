@@ -3,10 +3,10 @@ require "json"
 module Alephant
   module Logger
     class JSON
-      def initialize(log_path, allow_nesting = false)
+      def initialize(log_path, options = {})
         @log_file = File.open(log_path, "a+")
         @log_file.sync = true
-        @allow_nesting = allow_nesting
+        @nesting = options.fetch(:nesting) { false }
       end
 
       private
@@ -21,7 +21,7 @@ module Alephant
         define_method(level) do |hash|
           hash["level"] = level.to_s
 
-          hash = flatten_values_to_s hash if not @allow_nesting
+          hash = flatten_values_to_s hash if not @nesting
 
           @log_file.write(::JSON.generate(hash) + "\n")
         end
