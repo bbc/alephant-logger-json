@@ -1,5 +1,4 @@
 require "spec_helper"
-
 require "alephant/logger/json"
 
 describe Alephant::Logger::JSON do
@@ -12,7 +11,7 @@ describe Alephant::Logger::JSON do
 
   before do
     allow(File).to receive(:open) { log_file }
-    allow(log_file).to receive :sync= 
+    allow(log_file).to receive :sync=
   end
 
   shared_examples "JSON logging" do
@@ -61,13 +60,24 @@ describe Alephant::Logger::JSON do
     end
   end
 
-  %w[debug info warn error].each do |level|
+  shared_examples "gracefully fail with string arg" do
+    let(:log_message) { "Unable to connect to server" }
+
+    specify { expect(log_file).not_to receive(:write) }
+    specify do
+      expect { subject.debug log_message }.not_to raise_error
+    end
+  end
+
+  %w(debug info warn error).each do |level|
     describe "##{level}" do
       let(:level) { level }
 
       it_behaves_like "JSON logging"
 
       it_behaves_like "nests flattened to strings"
+
+      it_behaves_like "gracefully fail with string arg"
 
       context "with nesting allowed" do
         subject do
@@ -79,4 +89,3 @@ describe Alephant::Logger::JSON do
     end
   end
 end
-
