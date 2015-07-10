@@ -9,17 +9,15 @@ module Alephant
         @nesting = options.fetch(:nesting, false)
       end
 
-      begin
-        [:debug, :info, :warn, :error].each do |level|
-          define_method(level) do |hash|
+      [:debug, :info, :warn, :error].each do |level|
+        define_method(level) do |hash|
+          begin
             hash["level"] = level.to_s
-
             hash = flatten_values_to_s hash unless @nesting
-
             @log_file.write(::JSON.generate(hash) + "\n")
+          rescue IndexError
           end
         end
-      rescue IndexError
       end
 
       private
