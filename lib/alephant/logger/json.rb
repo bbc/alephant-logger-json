@@ -11,7 +11,7 @@ module Alephant
 
       [:debug, :info, :warn, :error].each do |level|
         define_method(level) do |hash|
-          return unless hash.is_a? Hash
+          return if hash.is_a? String
           hash["level"] = level.to_s
           hash = flatten_values_to_s hash unless @nesting
           @log_file.write(::JSON.generate(hash) + "\n")
