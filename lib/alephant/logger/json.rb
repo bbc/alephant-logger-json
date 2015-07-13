@@ -11,12 +11,10 @@ module Alephant
 
       [:debug, :info, :warn, :error].each do |level|
         define_method(level) do |hash|
-          begin
-            hash["level"] = level.to_s
-            hash = flatten_values_to_s hash unless @nesting
-            @log_file.write(::JSON.generate(hash) + "\n")
-          rescue IndexError
-          end
+          return unless hash.is_a? Hash
+          hash["level"] = level.to_s
+          hash = flatten_values_to_s hash unless @nesting
+          @log_file.write(::JSON.generate(hash) + "\n")
         end
       end
 
