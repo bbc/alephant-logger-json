@@ -14,10 +14,14 @@ describe Alephant::Logger::JSON do
     allow(log_file).to receive :sync=
   end
 
-  shared_examples "JSON logging" do
+  shared_context "flat log hash" do
     let(:log_hash) do
       { "foo" => "bar", "baz" => "quux" }
     end
+  end
+
+  shared_examples "JSON logging" do
+    include_context "flat log hash"
 
     it "writes JSON dump of hash to log with corresponding level key" do
       expect(log_file).to receive(:write) do |json_dump|
@@ -69,6 +73,24 @@ describe Alephant::Logger::JSON do
     end
   end
 
+  shared_examples "logs calling methods" do
+    include_context "flat log hash"
+
+    specify do
+      expect(log_file).to receive(:write) do |json|
+        expect(JSON.parse(json)["method"]).to eq "Dummy#dum"
+      end
+
+      class Dummy
+        def dum(subject, level, log_hash)
+          subject.send(level, log_hash)
+        end
+      end
+
+      Dummy.new.dum(subject, level, log_hash)
+    end
+  end
+
   %w(debug info warn error).each do |level|
     describe "##{level}" do
       let(:level) { level }
@@ -85,6 +107,14 @@ describe Alephant::Logger::JSON do
         end
 
         it_behaves_like "nesting allowed"
+      end
+
+      context "when logging calling methods" do
+        subject do
+          described_class.new(log_path, :log_methods => true)
+        end
+
+        it_behaves_like "logs calling methods"
       end
     end
   end
