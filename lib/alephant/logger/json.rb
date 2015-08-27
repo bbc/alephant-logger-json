@@ -15,7 +15,7 @@ module Alephant
         define_method(level) do |hash|
           return if hash.is_a? String
 
-          hash["method"] = calling_method binding if @log_methods
+          hash["method"] = calling_method if @log_methods
 
           hash["level"] = level.to_s
           hash = flatten_values_to_s hash unless @nesting
@@ -29,10 +29,10 @@ module Alephant
         Hash[hash.map { |k, v| [k, v.to_s] }]
       end
 
-      def calling_method(binding)
-        %w[self.class.name __method__]
-          .map { |code| binding.of_caller(3).eval code }
-          .join "#"
+      def calling_method
+        binding
+          .of_caller(2)
+          .eval '"#{self.class.name}##{__method__}"'
       end
     end
   end
