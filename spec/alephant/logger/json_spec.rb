@@ -1,3 +1,4 @@
+require "date"
 require "spec_helper"
 require "alephant/logger/json"
 
@@ -22,6 +23,15 @@ describe Alephant::Logger::JSON do
     it "writes JSON dump of hash to log with corresponding level key" do
       expect(log_file).to receive(:write) do |json_dump|
         expect(JSON.parse json_dump).to eq log_hash.merge("level" => level)
+      end
+
+      subject.send(level, log_hash)
+    end
+
+    it "automatically includes a timestamp" do
+      expect(log_file).to receive(:write) do |json_dump|
+        t = JSON.parse(json_dump)["timestamp"]
+        expect{DateTime.parse(t)}.to_not raise_error
       end
 
       subject.send(level, log_hash)
