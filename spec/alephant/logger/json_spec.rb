@@ -21,8 +21,11 @@ describe Alephant::Logger::JSON do
     end
 
     it "writes JSON dump of hash to log with corresponding level key" do
+      allow(Time).to receive(:now).and_return("foobar")
+
       expect(log_file).to receive(:write) do |json_dump|
-        expect(JSON.parse json_dump).to eq log_hash.merge("level" => level)
+        h = { "timestamp" => "foobar", "level" => level }
+        expect(JSON.parse json_dump).to eq h.merge log_hash
       end
 
       subject.send(level, log_hash)
@@ -32,6 +35,15 @@ describe Alephant::Logger::JSON do
       expect(log_file).to receive(:write) do |json_dump|
         t = JSON.parse(json_dump)["timestamp"]
         expect{DateTime.parse(t)}.to_not raise_error
+      end
+
+      subject.send(level, log_hash)
+    end
+
+    it "outputs the timestamp first" do
+      expect(log_file).to receive(:write) do |json_dump|
+        h = JSON.parse(json_dump)
+        expect(h.first[0].to_sym).to be :timestamp
       end
 
       subject.send(level, log_hash)
