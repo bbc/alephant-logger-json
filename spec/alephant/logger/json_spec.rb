@@ -24,7 +24,7 @@ describe Alephant::Logger::JSON do
       allow(Time).to receive(:now).and_return("foobar")
 
       expect(log_file).to receive(:write) do |json_dump|
-        h = { "timestamp" => "foobar", "level" => level }
+        h = { "timestamp" => "foobar", "id" => "n/a", "level" => level }
         expect(JSON.parse json_dump).to eq h.merge log_hash
       end
 
