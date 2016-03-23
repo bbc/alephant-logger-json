@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3"
   spec.add_development_dependency "rspec-nc"
   spec.add_development_dependency "rake-rspec"
+  spec.add_development_dependency "pry"
 end

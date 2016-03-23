@@ -7,6 +7,7 @@ describe Alephant::Logger::JSON do
     described_class.new log_path
   end
 
+  let(:fn)       { -> { "foo" } }
   let(:log_path) { "/log/path.log" }
   let(:log_file) { instance_double File }
 
@@ -47,6 +48,26 @@ describe Alephant::Logger::JSON do
       end
 
       subject.send(level, log_hash)
+    end
+
+    it "displays a default session value if a custom function is not provided" do
+      expect(log_file).to receive(:write) do |json_dump|
+        h = JSON.parse(json_dump)
+        expect(h["id"]).to eq "n/a"
+      end
+
+      subject.send(level, log_hash)
+    end
+
+    it "displays a custom session value when provided a lambda function" do
+      expect(log_file).to receive(:write) do |json_dump|
+        h = JSON.parse(json_dump)
+        expect(h["id"]).to eq "foo"
+      end
+
+      ::Alephant::Logger::JSON.session fn
+      subject.send(level, log_hash)
+      ::Alephant::Logger::JSON.session -> { "n/a" }
     end
   end
 

@@ -12,9 +12,10 @@ module Alephant
       [:debug, :info, :warn, :error].each do |level|
         define_method(level) do |hash|
           return if hash.is_a? String
+          @@session = -> { "n/a" } unless defined? @@session
           h = {
             :timestamp => Time.now.to_s,
-            :id        => user_id,
+            :id        => @@session.(),
             :level     => level.to_s
           }.merge hash
           hash = flatten_values_to_s h unless @nesting
@@ -22,15 +23,14 @@ module Alephant
         end
       end
 
+      def self.session(fn)
+        @@session = fn
+      end
+
       private
 
       def flatten_values_to_s(hash)
         Hash[hash.map { |k, v| [k, v.to_s] }]
-      end
-
-      def user_id
-        id = session[:user_id] if respond_to?(:session)
-        id.nil? ? "n/a" : id
       end
     end
   end
