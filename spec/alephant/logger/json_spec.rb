@@ -7,6 +7,7 @@ describe Alephant::Logger::JSON do
     described_class.new log_path
   end
 
+  let(:fn)       { -> { "foo" } }
   let(:log_path) { "/log/path.log" }
   let(:log_file) { instance_double File }
 
@@ -24,7 +25,7 @@ describe Alephant::Logger::JSON do
       allow(Time).to receive(:now).and_return("foobar")
 
       expect(log_file).to receive(:write) do |json_dump|
-        h = { "timestamp" => "foobar", "level" => level }
+        h = { "timestamp" => "foobar", "uuid" => "n/a", "level" => level }
         expect(JSON.parse json_dump).to eq h.merge log_hash
       end
 
@@ -47,6 +48,34 @@ describe Alephant::Logger::JSON do
       end
 
       subject.send(level, log_hash)
+    end
+
+    it "displays a default session value if a custom function is not provided" do
+      expect(log_file).to receive(:write) do |json_dump|
+        h = JSON.parse(json_dump)
+        expect(h["uuid"]).to eq "n/a"
+      end
+
+      subject.send(level, log_hash)
+    end
+
+    it "displays a custom session value when provided a user defined function" do
+      expect(log_file).to receive(:write) do |json_dump|
+        h = JSON.parse(json_dump)
+        expect(h["uuid"]).to eq "foo"
+      end
+
+      ::Alephant::Logger::JSON.session fn
+      subject.send(level, log_hash)
+      ::Alephant::Logger::JSON.session -> { "n/a" }
+    end
+
+    it "provides a static method for checking if a session has been set" do
+      ::Alephant::Logger::JSON.session fn
+      expect(::Alephant::Logger::JSON.session?).to eq "class variable"
+
+      ::Alephant::Logger::JSON.remove_class_variable :@@session
+      expect(::Alephant::Logger::JSON.session?).to eq nil
     end
   end
 

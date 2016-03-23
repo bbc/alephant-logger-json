@@ -12,13 +12,23 @@ module Alephant
       [:debug, :info, :warn, :error].each do |level|
         define_method(level) do |hash|
           return if hash.is_a? String
+          @@session = -> { "n/a" } unless defined? @@session
           h = {
             :timestamp => Time.now.to_s,
+            :uuid      => @@session.(),
             :level     => level.to_s
           }.merge hash
           hash = flatten_values_to_s h unless @nesting
           @log_file.write(::JSON.generate(hash) + "\n")
         end
+      end
+
+      def self.session(fn)
+        @@session = fn
+      end
+
+      def self.session?
+        defined?(@@session)
       end
 
       private
