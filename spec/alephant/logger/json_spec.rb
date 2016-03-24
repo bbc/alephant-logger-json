@@ -66,7 +66,7 @@ describe Alephant::Logger::JSON do
       end
 
       ::Alephant::Logger::JSON.session fn
-      subject.send(level, log_hash)
+      subject.send(level, binding, log_hash)
       ::Alephant::Logger::JSON.session -> { "n/a" }
     end
 

@@ -49,6 +49,20 @@ There are two methods available to help you:
 - `Alephant::Logger::JSON.session?`: boolean response checking if `@@session` has been set
 - `Alephant::Logger::JSON.session`: accepts a lambda function (its return value is internally assigned to `@@session`)
 
+When using tracing, you'll need to provide a binding context as the first argument to your log level method calls.
+
+This is to resolve issues with lambda's scope availability. See `Kernal#binding` for more details. 
+
+Example usage:
+
+```
+logger.info(binding, :foo => :bar)
+```
+
+If no `binding` is provided then tracing is ignored and the logger falls back to its default value.
+
+> Note: you can hide the binding necessity behind an abstraction layer if you prefer
+
 ## Contributing
 
 1. Fork it ( https://github.com/BBC-News/alephant-logger-json/fork )

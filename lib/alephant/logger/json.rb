@@ -1,3 +1,4 @@
+require_relative "./dynamic_binding.rb"
 require "json"
 
 module Alephant
@@ -10,12 +11,12 @@ module Alephant
       end
 
       [:debug, :info, :warn, :error].each do |level|
-        define_method(level) do |hash|
+        define_method(level) do |b=nil, hash|
           return if hash.is_a? String
           @@session = -> { "n/a" } unless defined? @@session
           h = {
             :timestamp => Time.now.to_s,
-            :uuid      => @@session.(),
+            :uuid      => b.nil? ? "n/a" : @@session.call_with_binding(b),
             :level     => level.to_s
           }.merge hash
           hash = flatten_values_to_s h unless @nesting
