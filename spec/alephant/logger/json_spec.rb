@@ -59,7 +59,7 @@ describe Alephant::Logger::JSON do
       subject.send(level, log_hash)
     end
 
-    it "displays a custom session value when provided a lambda function" do
+    it "displays a custom session value when provided a user defined function" do
       expect(log_file).to receive(:write) do |json_dump|
         h = JSON.parse(json_dump)
         expect(h["uuid"]).to eq "foo"
@@ -68,6 +68,13 @@ describe Alephant::Logger::JSON do
       ::Alephant::Logger::JSON.session fn
       subject.send(level, log_hash)
       ::Alephant::Logger::JSON.session -> { "n/a" }
+    end
+
+    it "provides a static method for checking if a session has been set" do
+      expect(::Alephant::Logger::JSON.session?).to eq "class variable"
+
+      ::Alephant::Logger::JSON.remove_class_variable :@@session
+      expect(::Alephant::Logger::JSON.session?).to eq nil
     end
   end
 

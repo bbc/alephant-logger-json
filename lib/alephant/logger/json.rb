@@ -27,6 +27,10 @@ module Alephant
         @@session = fn
       end
 
+      def self.session?
+        defined?(@@session)
+      end
+
       private
 
       def flatten_values_to_s(hash)
