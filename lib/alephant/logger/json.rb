@@ -15,7 +15,7 @@ module Alephant
           @@session = -> { "n/a" } unless defined? @@session
           h = {
             :timestamp => Time.now.to_s,
-            :id        => @@session.(),
+            :uuid      => @@session.(),
             :level     => level.to_s
           }.merge hash
           hash = flatten_values_to_s h unless @nesting

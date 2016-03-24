@@ -25,7 +25,7 @@ describe Alephant::Logger::JSON do
       allow(Time).to receive(:now).and_return("foobar")
 
       expect(log_file).to receive(:write) do |json_dump|
-        h = { "timestamp" => "foobar", "id" => "n/a", "level" => level }
+        h = { "timestamp" => "foobar", "uuid" => "n/a", "level" => level }
         expect(JSON.parse json_dump).to eq h.merge log_hash
       end
 
@@ -53,7 +53,7 @@ describe Alephant::Logger::JSON do
     it "displays a default session value if a custom function is not provided" do
       expect(log_file).to receive(:write) do |json_dump|
         h = JSON.parse(json_dump)
-        expect(h["id"]).to eq "n/a"
+        expect(h["uuid"]).to eq "n/a"
       end
 
       subject.send(level, log_hash)
@@ -62,7 +62,7 @@ describe Alephant::Logger::JSON do
     it "displays a custom session value when provided a lambda function" do
       expect(log_file).to receive(:write) do |json_dump|
         h = JSON.parse(json_dump)
-        expect(h["id"]).to eq "foo"
+        expect(h["uuid"]).to eq "foo"
       end
 
       ::Alephant::Logger::JSON.session fn
