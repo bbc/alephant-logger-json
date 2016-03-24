@@ -30,12 +30,24 @@ logger = Alephant::Logger.setup json_driver
 logger.info({ "some_field" => "some_value", "other_field" => "other_value" })
 ```
 
-By default, nested JSON values are flattened to strings.  To enable nesting,
-provided that your log analysis tooling supports that, create
-`Alephant::Logger::JSON` as follows:
+### Nesting
+
+By default, nested JSON values are flattened to strings.  To enable nesting, provided that your log analysis tooling supports that, create `Alephant::Logger::JSON` as follows:
+
 ```
 Alephant::Logger::JSON.new("path/to/logfile.log", :nesting => true)
 ```
+
+### Distributed Tracing
+
+The logger will set a key of `uuid` to `n/a` by default for each log request.
+
+This value can be changed by providing a lambda function that contains the logic to determine this value.
+
+There are two methods available to help you:
+
+- `Alephant::Logger::JSON.session?`: boolean response checking if `@@session` has been set
+- `Alephant::Logger::JSON.session`: accepts a lambda function (its return value is internally assigned to `@@session`)
 
 ## Contributing
 
