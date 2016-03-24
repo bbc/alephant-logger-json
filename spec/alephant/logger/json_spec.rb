@@ -71,6 +71,7 @@ describe Alephant::Logger::JSON do
     end
 
     it "provides a static method for checking if a session has been set" do
+      ::Alephant::Logger::JSON.session fn
       expect(::Alephant::Logger::JSON.session?).to eq "class variable"
 
       ::Alephant::Logger::JSON.remove_class_variable :@@session
