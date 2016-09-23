@@ -3,9 +3,7 @@ require "spec_helper"
 require "alephant/logger/json"
 
 describe Alephant::Logger::JSON do
-  subject do
-    described_class.new log_path
-  end
+  subject { described_class.new(log_path) }
 
   let(:fn)       { -> { "foo" } }
   let(:log_path) { "/log/path.log" }
@@ -65,17 +63,17 @@ describe Alephant::Logger::JSON do
         expect(h["uuid"]).to eq "foo"
       end
 
-      ::Alephant::Logger::JSON.session fn
+      described_class.session = fn
       subject.send(level, binding, log_hash)
-      ::Alephant::Logger::JSON.session -> { "n/a" }
+      described_class.session = -> { "n/a" }
     end
 
     it "provides a static method for checking if a session has been set" do
-      ::Alephant::Logger::JSON.session fn
-      expect(::Alephant::Logger::JSON.session?).to eq "class variable"
+      described_class.session = fn
+      expect(described_class.session?).to eq "instance-variable"
 
-      ::Alephant::Logger::JSON.remove_class_variable :@@session
-      expect(::Alephant::Logger::JSON.session?).to eq nil
+      described_class.remove_instance_variable :@session
+      expect(described_class.session?).to eq nil
     end
   end
 

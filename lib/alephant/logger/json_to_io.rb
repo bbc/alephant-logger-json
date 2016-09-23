@@ -7,9 +7,9 @@ module Alephant
       attr_reader :output
 
       def initialize(output, options = {})
-        @output   = output
-        @nesting  = options.fetch(:nesting, false)
-        @@session = -> { 'n/a' } unless defined? @@session
+        @output            = output
+        @nesting           = options.fetch(:nesting, false)
+        self.class.session = -> { 'n/a' } unless self.class.session?
       end
 
       private
