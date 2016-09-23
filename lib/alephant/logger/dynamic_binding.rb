@@ -7,7 +7,7 @@ module DynamicBinding
     def method_missing(m, *args)
       @bindings.reverse_each do |bind|
         begin
-          method = eval("method(%s)" % m.inspect, bind)
+          method = eval('method(%s)' % m.inspect, bind)
         rescue NameError
         else
           return method.call(*args)
@@ -18,7 +18,7 @@ module DynamicBinding
         rescue NameError
         end
       end
-      raise NoMethodError, "No such variable or method: %s" % m
+      raise NoMethodError, 'No such variable or method: %s' % m
     end
 
     def run_proc(p, *args)

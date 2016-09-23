@@ -1,14 +1,14 @@
-require_relative "./dynamic_binding.rb"
-require "json"
+require_relative './dynamic_binding.rb'
+require 'json'
 
 module Alephant
   module Logger
     class JSON
       def initialize(log_path, options = {})
-        @log_file          = File.open(log_path, "a+")
+        @log_file          = File.open(log_path, 'a+')
         @log_file.sync     = true
         @nesting           = options.fetch(:nesting, false)
-        self.class.session = -> { "n/a" } unless self.class.session?
+        self.class.session = -> { 'n/a' } unless self.class.session?
       end
 
       [:debug, :info, :warn, :error].each do |level|
