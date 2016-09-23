@@ -66,7 +66,7 @@ describe Alephant::Logger::JSONtoIO do
       described_class.session = fn
       expect(described_class.session?).to eq 'instance-variable'
 
-      described_class.remove_instance_variable :@session
+      described_class.send(:remove_instance_variable, :@session)
       expect(described_class.session?).to eq nil
     end
   end
