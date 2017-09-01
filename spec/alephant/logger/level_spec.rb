@@ -32,6 +32,15 @@ RSpec.describe Alephant::Logger::Level do
           expect(subject.log?).to be(true)
         end
       end
+
+      context 'when invalid' do
+        let(:desired) { :foo }
+        let(:defined) { :error }
+
+        it 'returns default true' do
+          expect(subject.log?).to be(true)
+        end
+      end
     end
   end
 end
