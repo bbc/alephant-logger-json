@@ -1,28 +1,27 @@
 module Alephant
   module Logger
-
     LEVELS = %i(debug info warn error).freeze
 
     class Level
-      def initialize(desired_level, defined_level)
-        @desired_level = desired_level
-        @defined_level = defined_level
+      def initialize(desired, defined)
+        @desired = desired
+        @defined = defined
       end
 
       def log?
-        desired_level_pos >= defined_level_pos
+        desired_level <= defined_level
       end
 
       private
 
-      attr_reader :desired_level, :defined_level
+      attr_reader :desired, :defined
 
-      def desired_level_pos
-        log_level(desired_level) || 0
+      def desired_level
+        log_level(desired) || 0
       end
 
-      def defined_level_pos
-        log_level(defined_level)
+      def defined_level
+        log_level(defined)
       end
 
       def log_level(level)
