@@ -7,16 +7,16 @@ require_relative 'shared_examples'
 describe Alephant::Logger::JSON do
   let(:fn)       { -> { 'foo' } }
   let(:log_path) { '/log/path.log' }
-  let(:log_file) { instance_double File }
+  let(:log_output_obj) { instance_double File }
 
   before do
-    allow(File).to receive(:open) { log_file }
-    allow(log_file).to receive :sync=
+    allow(File).to receive(:open) { log_output_obj }
+    allow(log_output_obj).to receive :sync=
   end
 
-  logging_levels = Alephant::Logger::LEVELS.map(&:to_s) # debug info warn error
+  logging_levels = Alephant::Logger::LEVELS.map(&:to_s)
 
-  logging_levels.each_with_index do |level, i|
+  %w(debug info warn error).each_with_index do |level, i|
     describe "##{level}" do
       let(:level) { level }
       let(:log_hash) { { 'foo' => 'bar', 'baz' => 'quux' } }
@@ -29,11 +29,11 @@ describe Alephant::Logger::JSON do
         context 'when same as defined' do
           let(:desired_level) { level.to_sym }
 
-          it_behaves_like 'a JSON log writer'
+          it_behaves_like 'a JSON log writer', :write
 
-          it_behaves_like 'nests flattened to strings'
+          it_behaves_like 'nests flattened to strings', :write
 
-          it_behaves_like 'gracefully fails with string arg'
+          it_behaves_like 'gracefully fails with string arg', :write
         end
 
         context 'when greater than defined' do
@@ -43,14 +43,14 @@ describe Alephant::Logger::JSON do
           end
 
           if i < levels_size
-            it_behaves_like 'a JSON log non writer'
+            it_behaves_like 'a JSON log non writer', :write
           else
-            it_behaves_like 'a JSON log writer'
+            it_behaves_like 'a JSON log writer', :write
 
-            it_behaves_like 'nests flattened to strings'
+            it_behaves_like 'nests flattened to strings', :write
           end
 
-          it_behaves_like 'gracefully fails with string arg'
+          it_behaves_like 'gracefully fails with string arg', :write
         end
 
         context 'when less than defined' do
@@ -58,11 +58,11 @@ describe Alephant::Logger::JSON do
             logging_levels[i > 0 ? logging_levels.index(level) - 1 : 0].to_sym
           end
 
-          it_behaves_like 'a JSON log writer'
+          it_behaves_like 'a JSON log writer', :write
 
-          it_behaves_like 'nests flattened to strings'
+          it_behaves_like 'nests flattened to strings', :write
 
-          it_behaves_like 'gracefully fails with string arg'
+          it_behaves_like 'gracefully fails with string arg', :write
         end
 
         context 'when invalid type' do
@@ -82,11 +82,11 @@ describe Alephant::Logger::JSON do
       context 'when desired log level is not defined' do
         subject { described_class.new(log_path) }
 
-        it_behaves_like 'a JSON log writer'
+        it_behaves_like 'a JSON log writer', :write
 
-        it_behaves_like 'nests flattened to strings'
+        it_behaves_like 'nests flattened to strings', :write
 
-        it_behaves_like 'gracefully fails with string arg'
+        it_behaves_like 'gracefully fails with string arg', :write
       end
 
       context 'with nesting allowed' do
@@ -94,7 +94,7 @@ describe Alephant::Logger::JSON do
           described_class.new(log_path, nesting: true)
         end
 
-        it_behaves_like 'nesting allowed'
+        it_behaves_like 'nesting allowed', :write
       end
     end
   end
