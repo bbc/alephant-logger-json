@@ -1,6 +1,8 @@
 require 'date'
 require 'spec_helper'
 require 'alephant/logger/json'
+require 'alephant/logger/level'
+require_relative 'shared_examples'
 
 describe Alephant::Logger::JSON do
   subject { described_class.new(log_path) }
@@ -14,119 +16,49 @@ describe Alephant::Logger::JSON do
     allow(log_file).to receive :sync=
   end
 
-  shared_examples 'JSON logging' do
-    let(:log_hash) do
-      { 'foo' => 'bar', 'baz' => 'quux' }
-    end
+  logging_levels = Alephant::Logger::LEVELS.map(&:to_s) # debug info warn error
 
-    it 'writes JSON dump of hash to log with corresponding level key' do
-      allow(Time).to receive(:now).and_return('foobar')
-
-      expect(log_file).to receive(:write) do |json_dump|
-        h = { 'timestamp' => 'foobar', 'uuid' => 'n/a', 'level' => level }
-        expect(JSON.parse(json_dump)).to eq h.merge log_hash
-      end
-
-      subject.send(level, log_hash)
-    end
-
-    it 'automatically includes a timestamp' do
-      expect(log_file).to receive(:write) do |json_dump|
-        t = JSON.parse(json_dump)['timestamp']
-        expect { DateTime.parse(t) }.to_not raise_error
-      end
-
-      subject.send(level, log_hash)
-    end
-
-    it 'outputs the timestamp first' do
-      expect(log_file).to receive(:write) do |json_dump|
-        h = JSON.parse(json_dump)
-        expect(h.first[0].to_sym).to be :timestamp
-      end
-
-      subject.send(level, log_hash)
-    end
-
-    it 'displays a default session value if a custom function is not provided' do
-      expect(log_file).to receive(:write) do |json_dump|
-        h = JSON.parse(json_dump)
-        expect(h['uuid']).to eq 'n/a'
-      end
-
-      subject.send(level, log_hash)
-    end
-
-    it 'displays a custom session value when provided a user defined function' do
-      expect(log_file).to receive(:write) do |json_dump|
-        h = JSON.parse(json_dump)
-        expect(h['uuid']).to eq 'foo'
-      end
-
-      described_class.session = fn
-      subject.send(level, binding, log_hash)
-      described_class.session = -> { 'n/a' }
-    end
-
-    it 'provides a static method for checking if a session has been set' do
-      described_class.session = fn
-      expect(described_class.session?).to eq 'instance-variable'
-
-      described_class.send(:remove_instance_variable, :@session)
-      expect(described_class.session?).to eq nil
-    end
-  end
-
-  shared_context 'nested log hash' do
-    let(:log_hash) do
-      { 'nest' => nest }
-    end
-
-    let(:nest) { { 'bird' => 'eggs' } }
-  end
-
-  shared_examples 'nests flattened to strings' do
-    include_context 'nested log hash'
-
-    specify do
-      expect(log_file).to receive(:write) do |json_dump|
-        expect(JSON.parse(json_dump)['nest']).to eq nest.to_s
-      end
-
-      subject.send(level, log_hash)
-    end
-  end
-
-  shared_examples 'nesting allowed' do
-    include_context 'nested log hash'
-
-    specify do
-      expect(log_file).to receive(:write) do |json_dump|
-        expect(JSON.parse(json_dump)).to eq log_hash
-      end
-
-      subject.send(level, log_hash)
-    end
-  end
-
-  shared_examples 'gracefully fail with string arg' do
-    let(:log_message) { 'Unable to connect to server' }
-
-    specify { expect(log_file).not_to receive(:write) }
-    specify do
-      expect { subject.debug log_message }.not_to raise_error
-    end
-  end
-
-  %w(debug info warn error).each do |level|
+  logging_levels.each_with_index do |level, i|
     describe "##{level}" do
       let(:level) { level }
+      levels_size = logging_levels.size - 1
 
-      it_behaves_like 'JSON logging'
+      context 'when desired log level is defined' do
+        subject { described_class.new(log_path, level: desired_level.to_sym) }
 
-      it_behaves_like 'nests flattened to strings'
+        context 'when same as defined' do
+          let(:desired_level) { level.to_sym }
 
-      it_behaves_like 'gracefully fail with string arg'
+          it_behaves_like 'a JSON log writer'
+
+          it_behaves_like 'nests flattened to strings'
+
+          it_behaves_like 'gracefully fail with string arg'
+        end
+
+        context 'when greater than defined' do
+          let(:desired_level) do
+            idx = logging_levels.index(level)
+            logging_levels[i == levels_size ? i : idx + 1]
+          end
+
+          it_behaves_like 'a JSON log non writer' if i < levels_size
+
+          it_behaves_like 'a JSON log writer' if i == levels_size
+        end
+
+        context 'when less than defined' do
+          let(:desired_level) do
+            logging_levels[i > 0 ? logging_levels.index(level) - 1 : 0]
+          end
+
+          it_behaves_like 'a JSON log writer'
+
+          it_behaves_like 'nests flattened to strings'
+
+          it_behaves_like 'gracefully fail with string arg'
+        end
+      end
 
       context 'with nesting allowed' do
         subject do
