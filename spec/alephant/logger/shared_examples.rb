@@ -1,8 +1,4 @@
 shared_examples 'a JSON log writer' do
-  let(:log_hash) do
-    { 'foo' => 'bar', 'baz' => 'quux' }
-  end
-
   it 'writes JSON dump of hash to log with corresponding level key' do
     allow(Time).to receive(:now).and_return('foobar')
 
@@ -68,8 +64,6 @@ shared_examples 'a JSON log writer' do
 end
 
 shared_examples 'a JSON log non writer' do
-  let(:log_hash) { { 'foo' => 'bar', 'baz' => 'quux' } }
-
   before do
     allow(Time).to receive(:now).and_return('foobar')
     subject.send(level, log_hash)
@@ -77,12 +71,6 @@ shared_examples 'a JSON log non writer' do
 
   it 'does not write' do
     expect(log_file).not_to receive(:write)
-    # expect(log_file).not_to receive(:write) do |json_dump|
-    #   h = { 'timestamp' => 'foobar', 'uuid' => 'n/a', 'level' => level }
-    #   expect(JSON.parse(json_dump)).to eq h.merge log_hash
-    # end
-
-    subject.send(level, log_hash)
   end
 end
 
@@ -118,7 +106,7 @@ shared_examples 'nesting allowed' do
   end
 end
 
-shared_examples 'gracefully fail with string arg' do
+shared_examples 'a graceful failure with string arg' do
   let(:log_message) { 'Unable to connect to server' }
 
   specify { expect(log_file).not_to receive(:write) }
