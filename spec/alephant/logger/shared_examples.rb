@@ -1,4 +1,4 @@
-shared_examples 'a JSON log writer' do |msg|
+shared_examples 'a JSON log writer' do
   let(:log_hash) do
     { 'foo' => 'bar', 'baz' => 'quux' }
   end
@@ -67,7 +67,7 @@ shared_examples 'a JSON log writer' do |msg|
   end
 end
 
-shared_examples 'a JSON log non writer' do |msg|
+shared_examples 'a JSON log non writer' do
   before do
     allow(Time).to receive(:now).and_return('foobar')
     subject.send(level, log_hash)
@@ -86,7 +86,7 @@ shared_context 'nested log hash' do
   let(:nest) { { 'bird' => 'eggs' } }
 end
 
-shared_examples 'nests flattened to strings' do |msg|
+shared_examples 'nests flattened to strings' do
   include_context 'nested log hash'
 
   specify do
@@ -98,7 +98,7 @@ shared_examples 'nests flattened to strings' do |msg|
   end
 end
 
-shared_examples 'nesting allowed' do |msg|
+shared_examples 'nesting allowed' do
   include_context 'nested log hash'
 
   specify do
@@ -110,7 +110,7 @@ shared_examples 'nesting allowed' do |msg|
   end
 end
 
-shared_examples 'gracefully fails with string arg' do |msg|
+shared_examples 'gracefully fails with string arg' do
   let(:log_message) { 'Unable to connect to server' }
 
   specify { expect(log_output_obj).not_to receive(msg) }
