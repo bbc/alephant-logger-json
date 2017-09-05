@@ -34,11 +34,46 @@ RSpec.describe Alephant::Logger::Level do
       end
 
       context 'when invalid' do
-        let(:desired) { :foo }
-        let(:defined) { :error }
+        context 'Symbol' do
+          let(:desired) { :foo }
+          let(:defined) { :error }
 
-        it 'returns default true' do
-          expect(subject.log?).to be(true)
+          it 'defaults to true' do
+            expect(subject.log?).to be(true)
+          end
+        end
+
+        context 'Integer' do
+          let(:defined) { :error }
+          context 'greater than defined' do
+            let(:desired) { 100 }
+
+            it 'defaults to false' do
+              expect(subject.log?).to be(false)
+            end
+          end
+
+          context 'less than defined' do
+            let(:desired) { -1 }
+
+            it 'defaults to true' do
+              expect(subject.log?).to be(true)
+            end
+          end
+        end
+
+        context 'Unsupported types' do
+          context 'String' do
+            let(:desired) { 'debug' }
+            let(:defined) { :error }
+
+            it 'raises an argument error' do
+              expect { subject.log? }.to raise_error(
+                ArgumentError,
+                /wrong type of argument: should be an Integer or Symbol./
+              )
+            end
+          end
         end
       end
     end
