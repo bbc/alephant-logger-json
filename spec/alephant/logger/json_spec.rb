@@ -33,7 +33,7 @@ describe Alephant::Logger::JSON do
 
           it_behaves_like 'nests flattened to strings'
 
-          it_behaves_like 'a graceful failure with string arg'
+          it_behaves_like 'gracefully fails with string arg'
         end
 
         context 'when greater than defined' do
@@ -50,7 +50,7 @@ describe Alephant::Logger::JSON do
             it_behaves_like 'nests flattened to strings'
           end
 
-          it_behaves_like 'a graceful failure with string arg'
+          it_behaves_like 'gracefully fails with string arg'
         end
 
         context 'when less than defined' do
@@ -62,7 +62,7 @@ describe Alephant::Logger::JSON do
 
           it_behaves_like 'nests flattened to strings'
 
-          it_behaves_like 'a graceful failure with string arg'
+          it_behaves_like 'gracefully fails with string arg'
         end
 
         context 'when invalid type' do
@@ -86,7 +86,7 @@ describe Alephant::Logger::JSON do
 
         it_behaves_like 'nests flattened to strings'
 
-        it_behaves_like 'a graceful failure with string arg'
+        it_behaves_like 'gracefully fails with string arg'
       end
 
       context 'with nesting allowed' do

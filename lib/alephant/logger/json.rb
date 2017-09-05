@@ -25,9 +25,6 @@ module Alephant
 
           hash = flatten_values_to_s(h) unless @nesting
 
-          puts "Write?: #{write_level?(level)}"
-          puts "des: #{desired_level}"
-          puts "def: #{level}"
           write(hash) if write_level?(level)
         end
       end
@@ -41,6 +38,7 @@ module Alephant
       end
 
       private
+
       attr_reader :desired_level
 
       def write(hash)

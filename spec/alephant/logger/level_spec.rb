@@ -45,6 +45,7 @@ RSpec.describe Alephant::Logger::Level do
 
         context 'Integer' do
           let(:defined) { :error }
+
           context 'greater than defined' do
             let(:desired) { 100 }
 

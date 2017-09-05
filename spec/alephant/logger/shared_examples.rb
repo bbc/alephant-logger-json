@@ -106,7 +106,7 @@ shared_examples 'nesting allowed' do
   end
 end
 
-shared_examples 'a graceful failure with string arg' do
+shared_examples 'gracefully fails with string arg' do
   let(:log_message) { 'Unable to connect to server' }
 
   specify { expect(log_file).not_to receive(:write) }
