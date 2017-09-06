@@ -1,79 +1,72 @@
 require 'spec_helper'
 require 'alephant/logger/level'
+require_relative 'support/level_shared_examples'
 
 RSpec.describe Alephant::Logger::Level do
-  subject { described_class.new(desired, defined) }
+  subject { described_class.new(log_level) }
 
-  describe '#log?' do
-    context 'desired level' do
-      context 'when less than defined level' do
-        let(:desired) { :debug }
-        let(:defined) { :info }
+  describe '#logs?' do
+    context 'Message level' do
+      context 'when defined as a Symbol' do
+        let(:log_level) { :info }
 
-        it 'returns true' do
-          expect(subject.log?).to be(true)
+        context 'when less than the log level' do
+          let(:message_level) { :debug }
+
+          it_behaves_like 'a writeable log'
+        end
+
+        context 'when greater than the log level' do
+          let(:message_level) { :warn }
+
+          it_behaves_like 'a non writeable log'
+        end
+
+        context 'when same as the log level' do
+          let(:message_level) { log_level }
+
+          it_behaves_like 'a writeable log'
         end
       end
 
-      context 'when greater than defined level' do
-        let(:desired) { :warn }
-        let(:defined) { :info }
+      context 'when defined as an Integer' do
+        let(:log_level) { :warn }
 
-        it 'returns false' do
-          expect(subject.log?).to be(false)
+        context 'when less than the log level' do
+          let(:message_level) { 0 }
+
+          it_behaves_like 'a writeable log'
+
+          context 'when out of range' do
+            let(:message_level) { -200 }
+
+            it_behaves_like 'a writeable log'
+          end
+        end
+
+        context 'when greater than the log level' do
+          let(:message_level) { 3 }
+
+          it_behaves_like 'a non writeable log'
+
+          context 'when out of range' do
+            let(:message_level) { 100 }
+
+            it_behaves_like 'a non writeable log'
+          end
         end
       end
 
-      context 'when same as defined level' do
-        let(:desired) { :info }
-        let(:defined) { desired }
+      context 'Unsupported types' do
+        context 'String' do
+          let(:log_level) { :error }
+          let(:message_level) { 'debug' }
 
-        it 'returns true' do
-          expect(subject.log?).to be(true)
-        end
-      end
-
-      context 'when invalid' do
-        context 'Symbol' do
-          let(:desired) { :foo }
-          let(:defined) { :error }
-
-          it 'defaults to true' do
-            expect(subject.log?).to be(true)
-          end
-        end
-
-        context 'Integer' do
-          let(:defined) { :error }
-
-          context 'greater than defined' do
-            let(:desired) { 100 }
-
-            it 'defaults to false' do
-              expect(subject.log?).to be(false)
-            end
-          end
-
-          context 'less than defined' do
-            let(:desired) { -1 }
-
-            it 'defaults to true' do
-              expect(subject.log?).to be(true)
-            end
-          end
-        end
-
-        context 'Unsupported types' do
-          context 'String' do
-            let(:desired) { 'debug' }
-            let(:defined) { :error }
-
-            it 'raises an argument error' do
-              expect { subject.log? }.to raise_error(
-                ArgumentError,
-                /wrong type of argument: should be an Integer or Symbol./
-              )
-            end
+          it 'raises an argument error' do
+            expect { subject.logs?(message_level) }.to raise_error(
+              ArgumentError,
+              /wrong type of argument: should be an Integer or Symbol./
+            )
           end
         end
       end

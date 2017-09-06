@@ -9,7 +9,7 @@ module Alephant
         @log_file          = File.open(log_path, 'a+')
         @log_file.sync     = true
         @nesting           = options.fetch(:nesting, false)
-        @desired_level     = options.fetch(:level, :debug)
+        @message_level     = options.fetch(:level, :debug)
         self.class.session = -> { 'n/a' } unless self.class.session?
       end
 
@@ -25,7 +25,7 @@ module Alephant
 
           hash = flatten_values_to_s(h) unless @nesting
 
-          write(hash) if write_level?(level)
+          write(hash) if writeable?(level)
         end
       end
 
@@ -39,14 +39,14 @@ module Alephant
 
       private
 
-      attr_reader :desired_level
+      attr_reader :message_level
 
       def write(hash)
         @log_file.write(::JSON.generate(hash) + "\n")
       end
 
-      def write_level?(level)
-        Alephant::Logger::Level.new(desired_level, level).log?
+      def writeable?(log_level)
+        Alephant::Logger::Level.new(log_level).logs?(message_level)
       end
 
       def flatten_values_to_s(hash)

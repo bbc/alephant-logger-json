@@ -1,7 +1,7 @@
 require 'date'
 require 'spec_helper'
 require 'alephant/logger/json_to_io'
-require_relative 'shared_examples'
+require_relative 'support/json_shared_examples'
 
 describe Alephant::Logger::JSONtoIO do
   let(:fn) { -> { 'foo' } }
