@@ -65,7 +65,7 @@ If no `binding` is provided then tracing is ignored and the logger falls back to
 
 ### Logging Levels
 
-The logger includes an option to define a desired logging level. Only log messages that are higher than the desired level will be logged.
+The logger includes an option to define a desired logging level. Only log levels that are equal to or higher than the desired level will be logged.
 The logger defaults to the _lowest_ level `0` i.e. `:debug` when a desired level is undefined.
 
 Example
@@ -78,13 +78,13 @@ Example
 # 3 => error
 
 # When Default level :debug
-json_logger = Alephant::Logger::JSON.new(ENV['APP_LOG'])
+json_logger = Alephant::Logger::JSON.new("path/to/logfile.log")
 
 # Log all levels >= 0
 json_logger.info "This will log"
 
 # When log level is defined
-json_logger = Alephant::Logger::JSON.new(ENV['APP_LOG'], level: :info)
+json_logger = Alephant::Logger::JSON.new("path/to/logfile.log", level: :info)
 
 # log all levels >= 1
 
@@ -92,7 +92,7 @@ json_logger.debug "This will NOT log"
 json_logger.info "This will log"
 ```
 
-> Note: The logger expects the user defined level to be of Symbol or Integer types.
+> Note: The logger expects the desired level to be a Symbol or Integer type.
 
 ## Contributing
 

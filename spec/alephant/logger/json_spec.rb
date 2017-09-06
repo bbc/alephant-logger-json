@@ -23,7 +23,7 @@ describe Alephant::Logger::JSON do
       let(:level) { level }
       let(:log_hash) { { 'foo' => 'bar', 'baz' => 'quux' } }
 
-      context 'when desired log level is defined' do
+      context 'when message level is defined' do
         subject { described_class.new(log_path, level: message_level) }
 
         context 'when same as defined' do
@@ -79,7 +79,7 @@ describe Alephant::Logger::JSON do
         end
       end
 
-      context 'when desired log level is not defined' do
+      context 'when message level is not defined' do
         subject { described_class.new(log_path) }
 
         it_behaves_like 'a JSON log writer'
