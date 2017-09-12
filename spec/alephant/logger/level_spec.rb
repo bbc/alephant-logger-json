@@ -6,33 +6,17 @@ RSpec.describe Alephant::Logger::Level do
   subject { described_class.new(log_level) }
 
   describe '#logs?' do
-    context 'Message level' do
-      context 'when defined as a Symbol' do
-        let(:log_level) { :info }
+    context 'Log level' do
+      let(:log_level) { :info }
 
-        context 'when less than the log level' do
+      context 'when higher than the message level' do
+        context 'Symbol' do
           let(:message_level) { :debug }
 
           it_behaves_like 'a writeable log'
         end
 
-        context 'when greater than the log level' do
-          let(:message_level) { :warn }
-
-          it_behaves_like 'a non writeable log'
-        end
-
-        context 'when same as the log level' do
-          let(:message_level) { log_level }
-
-          it_behaves_like 'a writeable log'
-        end
-      end
-
-      context 'when defined as an Integer' do
-        let(:log_level) { :warn }
-
-        context 'when less than the log level' do
+        context 'Integer' do
           let(:message_level) { 0 }
 
           it_behaves_like 'a writeable log'
@@ -43,8 +27,16 @@ RSpec.describe Alephant::Logger::Level do
             it_behaves_like 'a writeable log'
           end
         end
+      end
 
-        context 'when greater than the log level' do
+      context 'when lower than the message level' do
+        context 'Symbol' do
+          let(:message_level) { :warn }
+
+          it_behaves_like 'a non writeable log'
+        end
+
+        context 'Integer' do
           let(:message_level) { 3 }
 
           it_behaves_like 'a non writeable log'
@@ -54,6 +46,20 @@ RSpec.describe Alephant::Logger::Level do
 
             it_behaves_like 'a non writeable log'
           end
+        end
+      end
+
+      context 'when equal to the message level' do
+        context 'Symbol' do
+          let(:message_level) { log_level }
+
+          it_behaves_like 'a writeable log'
+        end
+
+        context 'Integer' do
+          let(:message_level) { 1 }
+
+          it_behaves_like 'a writeable log'
         end
       end
 

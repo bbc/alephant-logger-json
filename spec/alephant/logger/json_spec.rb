@@ -26,7 +26,7 @@ describe Alephant::Logger::JSON do
       context 'when message level is defined' do
         subject { described_class.new(log_path, level: message_level) }
 
-        context 'when same as defined' do
+        context 'when same as message level' do
           let(:message_level) { level.to_sym }
 
           it_behaves_like 'a JSON log writer'
@@ -36,24 +36,18 @@ describe Alephant::Logger::JSON do
           it_behaves_like 'gracefully fails with string arg'
         end
 
-        context 'when greater than defined' do
+        context 'when lower than the message level' do
           let(:message_level) do
             idx = logging_levels.index(level)
             logging_levels[i == levels_size ? i : idx + 1].to_sym
           end
 
-          if i < levels_size
-            it_behaves_like 'a JSON log non writer'
-          else
-            it_behaves_like 'a JSON log writer'
-
-            it_behaves_like 'nests flattened to strings'
-          end
+          it_behaves_like 'a JSON log non writer' unless i == levels_size
 
           it_behaves_like 'gracefully fails with string arg'
         end
 
-        context 'when less than defined' do
+        context 'when higher than the message level' do
           let(:message_level) do
             logging_levels[i > 0 ? logging_levels.index(level) - 1 : 0].to_sym
           end
