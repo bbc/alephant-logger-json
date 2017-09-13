@@ -3,61 +3,61 @@ require 'alephant/logger/level'
 require_relative 'support/level_shared_examples'
 
 RSpec.describe Alephant::Logger::Level do
-  subject { described_class.new(log_level) }
+  subject(:level_logger) { described_class.new(message_level) }
 
   describe '#logs?' do
-    context 'Log level' do
-      let(:log_level) { :info }
+    context 'Message level' do
+      let(:message_level) { :info }
 
-      context 'when higher than the message level' do
+      context 'when higher than the desired write level' do
         context 'Symbol' do
-          let(:message_level) { :debug }
+          let(:desired_write_level) { :debug }
 
           it_behaves_like 'a writeable log'
         end
 
         context 'Integer' do
-          let(:message_level) { 0 }
+          let(:desired_write_level) { 0 }
 
           it_behaves_like 'a writeable log'
 
           context 'when out of range' do
-            let(:message_level) { -200 }
+            let(:desired_write_level) { -200 }
 
             it_behaves_like 'a writeable log'
           end
         end
       end
 
-      context 'when lower than the message level' do
+      context 'when lower than the desired write level' do
         context 'Symbol' do
-          let(:message_level) { :warn }
+          let(:desired_write_level) { :warn }
 
           it_behaves_like 'a non writeable log'
         end
 
         context 'Integer' do
-          let(:message_level) { 3 }
+          let(:desired_write_level) { 3 }
 
           it_behaves_like 'a non writeable log'
 
           context 'when out of range' do
-            let(:message_level) { 100 }
+            let(:desired_write_level) { 100 }
 
             it_behaves_like 'a non writeable log'
           end
         end
       end
 
-      context 'when equal to the message level' do
+      context 'when equal to the desired write level' do
         context 'Symbol' do
-          let(:message_level) { log_level }
+          let(:desired_write_level) { message_level }
 
           it_behaves_like 'a writeable log'
         end
 
         context 'Integer' do
-          let(:message_level) { 1 }
+          let(:desired_write_level) { 1 }
 
           it_behaves_like 'a writeable log'
         end
@@ -65,11 +65,11 @@ RSpec.describe Alephant::Logger::Level do
 
       context 'Unsupported types' do
         context 'String' do
-          let(:log_level) { :error }
-          let(:message_level) { 'debug' }
+          let(:message_level) { :error }
+          let(:desired_write_level) { 'debug' }
 
           it 'raises an argument error' do
-            expect { subject.logs?(message_level) }.to raise_error(
+            expect { level_logger.logs?(desired_write_level) }.to raise_error(
               ArgumentError,
               /wrong type of argument: should be an Integer or Symbol./
             )
