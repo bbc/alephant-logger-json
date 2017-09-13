@@ -6,11 +6,11 @@ module Alephant
   module Logger
     class JSON
       def initialize(log_path, options = {})
-        @log_file          = File.open(log_path, 'a+')
-        @log_file.sync     = true
-        @nesting           = options.fetch(:nesting, false)
-        @message_level     = options.fetch(:level, :debug)
-        self.class.session = -> { 'n/a' } unless self.class.session?
+        @log_file            = File.open(log_path, 'a+')
+        @log_file.sync       = true
+        @nesting             = options.fetch(:nesting, false)
+        @desired_write_level = options.fetch(:level, :debug)
+        self.class.session   = -> { 'n/a' } unless self.class.session?
       end
 
       Alephant::Logger::LEVELS.each do |level|
@@ -39,14 +39,14 @@ module Alephant
 
       private
 
-      attr_reader :message_level
+      attr_reader :desired_write_level
 
       def write(hash)
         @log_file.write(::JSON.generate(hash) + "\n")
       end
 
-      def writeable?(log_level)
-        Alephant::Logger::Level.new(log_level).logs?(message_level)
+      def writeable?(message_level)
+        Alephant::Logger::Level.new(message_level).logs?(desired_write_level)
       end
 
       def flatten_values_to_s(hash)

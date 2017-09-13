@@ -3,30 +3,30 @@ module Alephant
     LEVELS = %i(debug info warn error).freeze
 
     class Level
-      def initialize(log_level)
-        @log_level = log_level
+      def initialize(message_level)
+        @message_level = message_level
       end
 
-      def logs?(message_level)
-        message_level_index(message_level) <= log_level_index
+      def logs?(desired_write_level)
+        message_level_index >= desired_write_level_index(desired_write_level)
       end
 
       private
 
-      attr_reader :log_level
+      attr_reader :message_level
 
-      def message_level_index(message_level)
-        case message_level
-        when Symbol then level_index(message_level) || 0
-        when Integer then message_level
+      def desired_write_level_index(desired_write_level)
+        case desired_write_level
+        when Symbol then level_index(desired_write_level) || 0
+        when Integer then desired_write_level
         else
           raise ArgumentError,
                 'wrong type of argument: should be an Integer or Symbol.'
         end
       end
 
-      def log_level_index
-        level_index(log_level)
+      def message_level_index
+        level_index(message_level)
       end
 
       def level_index(level)
