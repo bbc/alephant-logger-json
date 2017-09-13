@@ -39,14 +39,12 @@ module Alephant
 
       private
 
-      attr_reader :desired_write_level
-
       def write(hash)
         @log_file.write(::JSON.generate(hash) + "\n")
       end
 
       def writeable?(message_level)
-        Alephant::Logger::Level.new(message_level).logs?(desired_write_level)
+        Alephant::Logger::Level.new(message_level).logs?(@desired_write_level)
       end
 
       def flatten_values_to_s(hash)

@@ -13,8 +13,6 @@ module Alephant
 
       private
 
-      attr_reader :message_level
-
       def desired_write_level_index(desired_write_level)
         case desired_write_level
         when Symbol then level_index(desired_write_level) || 0
@@ -26,7 +24,7 @@ module Alephant
       end
 
       def message_level_index
-        level_index(message_level)
+        level_index(@message_level)
       end
 
       def level_index(level)

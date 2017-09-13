@@ -16,11 +16,13 @@ describe Alephant::Logger::JSONtoIO do
       let(:level) { level }
       let(:log_hash) { { 'foo' => 'bar', 'baz' => 'quux' } }
 
-      context 'when message level is defined' do
-        subject { described_class.new(log_output_obj, level: message_level) }
+      context 'when the desired write level is specified' do
+        subject(:logger) do
+          described_class.new(log_output_obj, level: desired_write_level)
+        end
 
-        context 'when same as message level' do
-          let(:message_level) { level.to_sym }
+        context 'when same as the desired write level' do
+          let(:desired_write_level) { level.to_sym }
 
           it_behaves_like 'a JSON log writer'
 
@@ -29,8 +31,8 @@ describe Alephant::Logger::JSONtoIO do
           it_behaves_like 'gracefully fails with string arg'
         end
 
-        context 'when lower than the message level' do
-          let(:message_level) do
+        context 'when lower than the desired write level' do
+          let(:desired_write_level) do
             idx = logging_levels.index(level)
             logging_levels[i == levels_size ? i : idx + 1].to_sym
           end
@@ -40,8 +42,8 @@ describe Alephant::Logger::JSONtoIO do
           it_behaves_like 'gracefully fails with string arg'
         end
 
-        context 'when higher than the message level' do
-          let(:message_level) do
+        context 'when higher than the desired write level' do
+          let(:desired_write_level) do
             logging_levels[i > 0 ? logging_levels.index(level) - 1 : 0].to_sym
           end
 
@@ -54,10 +56,10 @@ describe Alephant::Logger::JSONtoIO do
 
         context 'when invalid type' do
           context 'String' do
-            let(:message_level) { level }
+            let(:desired_write_level) { level }
 
             it 'raises an argument error' do
-              expect { subject.send(level, log_hash) }.to raise_error(
+              expect { logger.send(level, log_hash) }.to raise_error(
                 ArgumentError,
                 /wrong type of argument: should be an Integer or Symbol./
               )
@@ -66,8 +68,8 @@ describe Alephant::Logger::JSONtoIO do
         end
       end
 
-      context 'when message level is not defined' do
-        subject { described_class.new(log_output_obj) }
+      context 'when the desired write level is not specified' do
+        subject(:logger) { described_class.new(log_output_obj) }
 
         it_behaves_like 'a JSON log writer'
 
@@ -77,7 +79,7 @@ describe Alephant::Logger::JSONtoIO do
       end
 
       context 'with nesting allowed' do
-        subject { described_class.new(log_output_obj, nesting: true) }
+        subject(:logger) { described_class.new(log_output_obj, nesting: true) }
 
         it_behaves_like 'nesting allowed'
       end
