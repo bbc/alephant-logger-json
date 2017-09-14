@@ -1,6 +1,6 @@
 require 'json'
 require_relative 'dynamic_binding'
-require_relative 'level_checker'
+require_relative 'levels_controller'
 
 module Alephant
   module Logger
@@ -13,7 +13,7 @@ module Alephant
         self.class.session = -> { 'n/a' } unless self.class.session?
       end
 
-      Alephant::Logger::LevelChecker::LEVELS.each do |level|
+      Alephant::Logger::LevelsController::LEVELS.each do |level|
         define_method(level) do |b = nil, hash|
           return if hash.is_a? String
 
@@ -44,7 +44,7 @@ module Alephant
       end
 
       def writeable?(message_level)
-        Alephant::Logger::LevelChecker.logs?(
+        Alephant::Logger::LevelsController.should_log?(
           message_level: message_level,
           desired_level: @write_level
         )

@@ -1,11 +1,11 @@
 require 'spec_helper'
-require 'alephant/logger/level_checker'
-require_relative 'support/level_checker_shared_examples'
+require 'alephant/logger/levels_controller'
+require_relative 'support/levels_controller_shared_examples'
 
-RSpec.describe Alephant::Logger::LevelChecker do
-  describe '.logs?' do
+RSpec.describe Alephant::Logger::LevelsController do
+  describe '.should_log?' do
     subject do
-      described_class.logs?(
+      described_class.should_log?(
         message_level: message_level,
         desired_level: desired_level
       )
@@ -14,7 +14,7 @@ RSpec.describe Alephant::Logger::LevelChecker do
     context 'Message level' do
       let(:message_level) { :info }
 
-      context 'when message level is higher than desired level' do
+      context 'when the message level is higher than the desired level' do
         context 'Symbol' do
           let(:desired_level) { :debug }
 
@@ -40,7 +40,7 @@ RSpec.describe Alephant::Logger::LevelChecker do
         end
       end
 
-      context 'when message level is lower than desired level' do
+      context 'when the message level is lower than the desired level' do
         context 'Symbol' do
           let(:desired_level) { :warn }
 
@@ -66,7 +66,7 @@ RSpec.describe Alephant::Logger::LevelChecker do
         end
       end
 
-      context 'when message level is equal to desired level' do
+      context 'when the message level is equal to the desired level' do
         context 'Symbol' do
           let(:desired_level) { message_level }
 
@@ -85,8 +85,19 @@ RSpec.describe Alephant::Logger::LevelChecker do
           it_behaves_like 'a loggable level'
         end
       end
+    end
 
-      context 'when unsupported type' do
+    context 'Desired level' do
+      context 'when the desired level is not in LEVELS' do
+        let(:message_level) { :error }
+        let(:desired_level) { :foobar }
+
+        it 'defaults to debug' do
+          expect(subject).to be(true)
+        end
+      end
+
+      context 'when the desired level is an unsupported type' do
         context 'Hash' do
           let(:message_level) { :error }
           let(:desired_level) { {} }

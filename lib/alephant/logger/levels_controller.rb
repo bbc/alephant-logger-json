@@ -1,10 +1,10 @@
 module Alephant
   module Logger
-    class LevelChecker
+    class LevelsController
       LEVELS = %i(debug info warn error).freeze
 
       class << self
-        def logs?(message_level:, desired_level:)
+        def should_log?(message_level:, desired_level:)
           message_level_index(message_level) >=
             desired_level_index(desired_level)
         end
