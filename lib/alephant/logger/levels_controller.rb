@@ -28,10 +28,6 @@ module Alephant
           end
         end
 
-        def message_level_index(message_level)
-          level_index(message_level)
-        end
-
         def level_index_with_default(desired_level)
           level_index(desired_level) || 0
         end
