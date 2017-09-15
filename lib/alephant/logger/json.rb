@@ -9,7 +9,7 @@ module Alephant
         @log_file          = File.open(log_path, 'a+')
         @log_file.sync     = true
         @nesting           = options.fetch(:nesting, false)
-        @write_level       = options.fetch(:write_level, :debug)
+        @write_level       = options.fetch(:level, :debug)
         self.class.session = -> { 'n/a' } unless self.class.session?
       end
 

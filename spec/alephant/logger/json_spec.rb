@@ -24,7 +24,7 @@ describe Alephant::Logger::JSON do
 
       context 'when write level is specified' do
         subject(:logger) do
-          described_class.new(log_path, write_level: write_level)
+          described_class.new(log_path, level: write_level)
         end
 
         context 'when message level is same as write level' do

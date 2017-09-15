@@ -19,8 +19,8 @@ module Alephant
           else
             raise(
               ArgumentError,
-              "wrong type of argument #{desired_level.class}: "\
-              'should be an Integer, Symbol or String.'
+              'wrong type of argument: expected Integer, Symbol or String. '\
+              "got #{desired_level.class}"
             )
           end
         end

@@ -105,8 +105,8 @@ RSpec.describe Alephant::Logger::LevelsController do
           it 'raises an argument error' do
             expect { subject }.to raise_error(
               ArgumentError,
-              'wrong type of argument Hash: should be an Integer, '\
-              'Symbol or String.'
+              'wrong type of argument: expected Integer, '\
+              'Symbol or String. got Hash'
             )
           end
         end
