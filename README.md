@@ -92,7 +92,7 @@ json_logger.debug "This will NOT log"
 json_logger.info "This will log"
 ```
 
-> Note: The logger expects the desired level to be a Symbol or Integer type.
+> Note: The logger expects the desired level to be defined as a Symbol, String or Integer type.
 
 ## Contributing
 
