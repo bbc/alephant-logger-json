@@ -11,7 +11,7 @@ RSpec.describe Alephant::Logger::LevelsController do
       )
     end
 
-    context 'Message level' do
+    describe 'Message level' do
       let(:message_level) { :info }
 
       context 'when message level is higher than desired level' do
@@ -85,9 +85,25 @@ RSpec.describe Alephant::Logger::LevelsController do
           it_behaves_like 'a loggable level'
         end
       end
+
+      context 'when message level is invalid' do
+        let(:desired_level) { :debug }
+
+        context 'when message level is not in LEVELS' do
+          let(:message_level) { :foobar }
+
+          it_behaves_like 'a non loggable level'
+        end
+
+        context 'when message level is nil' do
+          let(:message_level) { nil }
+
+          it_behaves_like 'a non loggable level'
+        end
+      end
     end
 
-    context 'Desired level' do
+    describe 'Desired level' do
       context 'when desired level is not in LEVELS' do
         let(:message_level) { :error }
         let(:desired_level) { :foobar }
@@ -107,6 +123,19 @@ RSpec.describe Alephant::Logger::LevelsController do
               ArgumentError,
               'wrong type of argument: expected Integer, '\
               'Symbol or String. got Hash'
+            )
+          end
+        end
+
+        context 'Nil' do
+          let(:message_level) { :error }
+          let(:desired_level) { nil }
+
+          it 'raises an argument error' do
+            expect { subject }.to raise_error(
+              ArgumentError,
+              'wrong type of argument: expected Integer, '\
+              'Symbol or String. got NilClass'
             )
           end
         end

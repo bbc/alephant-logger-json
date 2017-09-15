@@ -9,3 +9,9 @@ shared_examples 'a non loggable level' do
     expect(subject).to be(false)
   end
 end
+
+shared_examples 'defaults to debug' do
+  it 'returns true' do
+    expect(subject).to be(true)
+  end
+end

@@ -5,8 +5,11 @@ module Alephant
 
       class << self
         def should_log?(message_level:, desired_level:)
-          message_level_index(message_level) >=
-            desired_level_index(desired_level)
+          message_level_index = level_index(message_level)
+
+          return false unless message_level_index
+
+          message_level_index >= desired_level_index(desired_level)
         end
 
         private

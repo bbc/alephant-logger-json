@@ -94,7 +94,7 @@ describe Alephant::Logger::JSON do
             it_behaves_like 'gracefully fails with string message'
           end
 
-          context 'Symbol' do
+          context 'Integer' do
             let(:write_level) { write_level_index }
 
             it_behaves_like 'a JSON log writer'
