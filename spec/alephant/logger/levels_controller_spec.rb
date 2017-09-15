@@ -4,7 +4,7 @@ require_relative 'support/levels_controller_shared_examples'
 
 RSpec.describe Alephant::Logger::LevelsController do
   describe '.should_log?' do
-    subject do
+    subject(:loggable?) do
       described_class.should_log?(
         message_level: message_level,
         desired_level: desired_level
@@ -109,7 +109,7 @@ RSpec.describe Alephant::Logger::LevelsController do
         let(:desired_level) { :foobar }
 
         it 'defaults to debug' do
-          expect(subject).to be(true)
+          expect(loggable?).to be(true)
         end
       end
 
@@ -119,7 +119,7 @@ RSpec.describe Alephant::Logger::LevelsController do
           let(:desired_level) { {} }
 
           it 'raises an argument error' do
-            expect { subject }.to raise_error(
+            expect { loggable? }.to raise_error(
               ArgumentError,
               'wrong type of argument: expected Integer, '\
               'Symbol or String. got Hash'
@@ -132,7 +132,7 @@ RSpec.describe Alephant::Logger::LevelsController do
           let(:desired_level) { nil }
 
           it 'raises an argument error' do
-            expect { subject }.to raise_error(
+            expect { loggable? }.to raise_error(
               ArgumentError,
               'wrong type of argument: expected Integer, '\
               'Symbol or String. got NilClass'
