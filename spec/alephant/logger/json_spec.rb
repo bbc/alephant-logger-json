@@ -1,7 +1,7 @@
 require 'date'
 require 'spec_helper'
 require 'alephant/logger/json'
-require 'alephant/logger/level'
+require 'alephant/logger/levels_controller'
 require_relative 'support/json_shared_examples'
 
 describe Alephant::Logger::JSON do
@@ -15,74 +15,105 @@ describe Alephant::Logger::JSON do
     allow(log_output_obj).to receive :sync=
   end
 
-  logging_levels = Alephant::Logger::LEVELS.map(&:to_s)
-  levels_size = logging_levels.size - 1
+  logging_levels = Alephant::Logger::LevelsController::LEVELS
 
-  %w(debug info warn error).each_with_index do |level, i|
+  logging_levels.each_with_index do |level, i|
     describe "##{level}" do
       let(:level) { level }
       let(:log_hash) { { 'foo' => 'bar', 'baz' => 'quux' } }
 
-      context 'when the desired write level is specified' do
+      context 'when write level is specified' do
         subject(:logger) do
-          described_class.new(log_path, level: desired_write_level)
+          described_class.new(log_path, write_level: write_level)
         end
 
-        context 'when same as the desired write level' do
-          let(:desired_write_level) { level.to_sym }
+        context 'when message level is same as write level' do
+          context 'Symbol' do
+            let(:write_level) { level }
 
-          it_behaves_like 'a JSON log writer'
+            it_behaves_like 'a JSON log writer'
 
-          it_behaves_like 'nests flattened to strings'
+            it_behaves_like 'nested JSON message flattened to strings'
 
-          it_behaves_like 'gracefully fails with string arg'
-        end
-
-        context 'when lower than the desired write level' do
-          let(:desired_write_level) do
-            idx = logging_levels.index(level)
-            logging_levels[i == levels_size ? i : idx + 1].to_sym
+            it_behaves_like 'gracefully fails with string message'
           end
 
-          it_behaves_like 'a JSON log non writer' unless i == levels_size
-
-          it_behaves_like 'gracefully fails with string arg'
-        end
-
-        context 'when higher than the desired write level' do
-          let(:desired_write_level) do
-            logging_levels[i > 0 ? logging_levels.index(level) - 1 : 0].to_sym
-          end
-
-          it_behaves_like 'a JSON log writer'
-
-          it_behaves_like 'nests flattened to strings'
-
-          it_behaves_like 'gracefully fails with string arg'
-        end
-
-        context 'when invalid type' do
           context 'String' do
-            let(:desired_write_level) { level }
+            let(:write_level) { level.to_s }
 
-            it 'raises an argument error' do
-              expect { logger.send(level, log_hash) }.to raise_error(
-                ArgumentError,
-                /wrong type of argument: should be an Integer or Symbol./
-              )
-            end
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+
+          context 'Integer' do
+            let(:write_level) { logging_levels.index(level) }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+        end
+
+        context 'when message level is lower than write level' do
+          context 'Integer' do
+            let(:write_level) { logging_levels.index(level) + 1 }
+
+            it_behaves_like 'a JSON log non writer'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+        end
+
+        context 'when message level is higher than write level' do
+          let(:write_level_index) do
+            i > 0 ? logging_levels.index(level) - 1 : 0
+          end
+
+          context 'Symbol' do
+            let(:write_level) { logging_levels[write_level_index] }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+
+          context 'String' do
+            let(:write_level) { logging_levels[write_level_index].to_s }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+
+          context 'Symbol' do
+            let(:write_level) { write_level_index }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
           end
         end
       end
 
-      context 'when the desired write level is not specified' do
+      context 'when write level is not specified' do
         subject(:logger) { described_class.new(log_path) }
 
         it_behaves_like 'a JSON log writer'
 
-        it_behaves_like 'nests flattened to strings'
+        it_behaves_like 'nested JSON message flattened to strings'
 
-        it_behaves_like 'gracefully fails with string arg'
+        it_behaves_like 'gracefully fails with string message'
       end
 
       context 'with nesting allowed' do

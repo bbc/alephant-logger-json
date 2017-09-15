@@ -7,7 +7,7 @@ shared_examples 'a JSON log writer' do
     allow(Time).to receive(:now).and_return('foobar')
 
     expect(log_output_obj).to receive(msg) do |json_dump|
-      h = { 'timestamp' => 'foobar', 'uuid' => 'n/a', 'level' => level }
+      h = { 'timestamp' => 'foobar', 'uuid' => 'n/a', 'level' => level.to_s }
       expect(JSON.parse(json_dump)).to eq(h.merge(log_hash))
     end
 
@@ -84,7 +84,7 @@ shared_context 'nested log hash' do
   let(:nest) { { 'bird' => 'eggs' } }
 end
 
-shared_examples 'nests flattened to strings' do
+shared_examples 'nested JSON message flattened to strings' do
   include_context 'nested log hash'
 
   specify do
@@ -108,7 +108,7 @@ shared_examples 'nesting allowed' do
   end
 end
 
-shared_examples 'gracefully fails with string arg' do
+shared_examples 'gracefully fails with string message' do
   let(:log_message) { 'Unable to connect to server' }
 
   specify { expect(log_output_obj).not_to receive(msg) }

@@ -14,7 +14,7 @@ RSpec.describe Alephant::Logger::LevelsController do
     context 'Message level' do
       let(:message_level) { :info }
 
-      context 'when the message level is higher than the desired level' do
+      context 'when message level is higher than desired level' do
         context 'Symbol' do
           let(:desired_level) { :debug }
 
@@ -40,7 +40,7 @@ RSpec.describe Alephant::Logger::LevelsController do
         end
       end
 
-      context 'when the message level is lower than the desired level' do
+      context 'when message level is lower than desired level' do
         context 'Symbol' do
           let(:desired_level) { :warn }
 
@@ -66,7 +66,7 @@ RSpec.describe Alephant::Logger::LevelsController do
         end
       end
 
-      context 'when the message level is equal to the desired level' do
+      context 'when message level is equal to desired level' do
         context 'Symbol' do
           let(:desired_level) { message_level }
 
@@ -88,7 +88,7 @@ RSpec.describe Alephant::Logger::LevelsController do
     end
 
     context 'Desired level' do
-      context 'when the desired level is not in LEVELS' do
+      context 'when desired level is not in LEVELS' do
         let(:message_level) { :error }
         let(:desired_level) { :foobar }
 
@@ -97,7 +97,7 @@ RSpec.describe Alephant::Logger::LevelsController do
         end
       end
 
-      context 'when the desired level is an unsupported type' do
+      context 'when desired level is an unsupported type' do
         context 'Hash' do
           let(:message_level) { :error }
           let(:desired_level) { {} }
@@ -105,7 +105,8 @@ RSpec.describe Alephant::Logger::LevelsController do
           it 'raises an argument error' do
             expect { subject }.to raise_error(
               ArgumentError,
-              /wrong type of argument: should be an Integer, Symbol or String./
+              'wrong type of argument Hash: should be an Integer, '\
+              'Symbol or String.'
             )
           end
         end
