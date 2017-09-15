@@ -1,129 +1,116 @@
 require 'date'
 require 'spec_helper'
 require 'alephant/logger/json_to_io'
+require_relative 'support/json_shared_examples'
 
 describe Alephant::Logger::JSONtoIO do
-  subject { described_class.new(logger_io) }
+  let(:fn) { -> { 'foo' } }
+  let(:log_output_obj) { spy }
+  let(:msg) { :puts }
 
-  let(:fn)        { -> { 'foo' } }
-  let(:logger_io) { spy }
+  logging_levels = Alephant::Logger::LevelsController::LEVELS
 
-  shared_examples 'JSON logging' do
-    let(:log_hash) do
-      { 'foo' => 'bar', 'baz' => 'quux' }
-    end
-
-    it 'writes JSON dump of hash to log with corresponding level key' do
-      allow(Time).to receive(:now).and_return('foobar')
-
-      expect(logger_io).to receive(:puts) do |json_dump|
-        h = { 'timestamp' => 'foobar', 'uuid' => 'n/a', 'level' => level }
-        expect(JSON.parse(json_dump)).to eq h.merge log_hash
-      end
-
-      subject.public_send(level, log_hash)
-    end
-
-    it 'automatically includes a timestamp' do
-      expect(logger_io).to receive(:puts) do |json_dump|
-        t = JSON.parse(json_dump)['timestamp']
-        expect { DateTime.parse(t) }.to_not raise_error
-      end
-
-      subject.public_send(level, log_hash)
-    end
-
-    it 'outputs the timestamp first' do
-      expect(logger_io).to receive(:puts) do |json_dump|
-        h = JSON.parse(json_dump)
-        expect(h.first[0].to_sym).to be :timestamp
-      end
-
-      subject.public_send(level, log_hash)
-    end
-
-    it 'displays a default session value if a custom function is not provided' do
-      expect(logger_io).to receive(:puts) do |json_dump|
-        h = JSON.parse(json_dump)
-        expect(h['uuid']).to eq 'n/a'
-      end
-
-      subject.public_send(level, log_hash)
-    end
-
-    it 'displays a custom session value when provided a user defined function' do
-      expect(logger_io).to receive(:puts) do |json_dump|
-        h = JSON.parse(json_dump)
-        expect(h['uuid']).to eq 'foo'
-      end
-
-      described_class.session = fn
-      subject.send(level, binding, log_hash)
-      described_class.session = -> { 'n/a' }
-    end
-
-    it 'provides a static method for checking if a session has been set' do
-      described_class.session = fn
-      expect(described_class.session?).to eq 'instance-variable'
-
-      described_class.send(:remove_instance_variable, :@session)
-      expect(described_class.session?).to eq nil
-    end
-  end
-
-  shared_context 'nested log hash' do
-    let(:log_hash) do
-      { 'nest' => nest }
-    end
-
-    let(:nest) { { 'bird' => 'eggs' } }
-  end
-
-  shared_examples 'nests flattened to strings' do
-    include_context 'nested log hash'
-
-    specify do
-      expect(logger_io).to receive(:puts) do |json_dump|
-        expect(JSON.parse(json_dump)['nest']).to eq nest.to_s
-      end
-
-      subject.public_send(level, log_hash)
-    end
-  end
-
-  shared_examples 'nesting allowed' do
-    include_context 'nested log hash'
-
-    specify do
-      expect(logger_io).to receive(:puts) do |json_dump|
-        expect(JSON.parse(json_dump)).to eq log_hash
-      end
-
-      subject.public_send(level, log_hash)
-    end
-  end
-
-  shared_examples 'gracefully fail with string arg' do
-    let(:log_message) { 'Unable to connect to server' }
-
-    specify { expect(logger_io).not_to receive(:puts) }
-    specify do
-      expect { subject.debug log_message }.not_to raise_error
-    end
-  end
-
-  %w(debug info warn error).each do |level|
+  logging_levels.each_with_index do |level, i|
     describe "##{level}" do
       let(:level) { level }
+      let(:log_hash) { { 'foo' => 'bar', 'baz' => 'quux' } }
 
-      it_behaves_like 'JSON logging'
+      context 'when write level is specified' do
+        subject(:logger) do
+          described_class.new(log_output_obj, level: write_level)
+        end
 
-      it_behaves_like 'nests flattened to strings'
+        context 'when message level is same as write level' do
+          context 'Symbol' do
+            let(:write_level) { level }
 
-      it_behaves_like 'gracefully fail with string arg'
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+
+          context 'String' do
+            let(:write_level) { level.to_s }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+
+          context 'Integer' do
+            let(:write_level) { logging_levels.index(level) }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+        end
+
+        context 'when message level is lower than write level' do
+          context 'Integer' do
+            let(:write_level) { logging_levels.index(level) + 1 }
+
+            it_behaves_like 'a JSON log non writer'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+        end
+
+        context 'when message level is higher than write level' do
+          let(:write_level_index) do
+            i > 0 ? logging_levels.index(level) - 1 : 0
+          end
+
+          context 'Symbol' do
+            let(:write_level) { logging_levels[write_level_index] }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+
+          context 'String' do
+            let(:write_level) { logging_levels[write_level_index].to_s }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+
+          context 'Symbol' do
+            let(:write_level) { write_level_index }
+
+            it_behaves_like 'a JSON log writer'
+
+            it_behaves_like 'nested JSON message flattened to strings'
+
+            it_behaves_like 'gracefully fails with string message'
+          end
+        end
+      end
+
+      context 'when write level is not specified' do
+        subject(:logger) { described_class.new(log_output_obj) }
+
+        it_behaves_like 'a JSON log writer'
+
+        it_behaves_like 'nested JSON message flattened to strings'
+
+        it_behaves_like 'gracefully fails with string message'
+      end
 
       context 'with nesting allowed' do
-        subject { described_class.new(logger_io, nesting: true) }
+        subject(:logger) { described_class.new(log_output_obj, nesting: true) }
 
         it_behaves_like 'nesting allowed'
       end
