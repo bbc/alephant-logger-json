@@ -1,10 +1,13 @@
 module Alephant
   module Logger
     class LevelsController
-      LEVELS = %i(debug info warn error).freeze
+      # Ruby 1.x syntax used to support JRuby 1.7.x
+      # rubocop:disable Style/SymbolArray
+      LEVELS = [:debug, :info, :warn, :error].freeze
+      # rubocop:enable Style/SymbolArray
 
       class << self
-        def should_log?(message_level:, desired_level:)
+        def should_log?(message_level, desired_level)
           message_level_index = level_index(message_level)
 
           return false unless message_level_index
