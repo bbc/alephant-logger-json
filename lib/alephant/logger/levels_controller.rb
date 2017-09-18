@@ -1,7 +1,7 @@
 module Alephant
   module Logger
     class LevelsController
-      # Ruby 1.x syntax used to support JRuby 1.17.x
+      # Ruby 1.x syntax used to support JRuby 1.7.x
       # rubocop:disable Style/SymbolArray
       LEVELS = [:debug, :info, :warn, :error].freeze
       # rubocop:enable Style/SymbolArray
