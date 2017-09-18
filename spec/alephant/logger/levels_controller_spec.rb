@@ -5,10 +5,7 @@ require_relative 'support/levels_controller_shared_examples'
 RSpec.describe Alephant::Logger::LevelsController do
   describe '.should_log?' do
     subject(:loggable?) do
-      described_class.should_log?(
-        message_level: message_level,
-        desired_level: desired_level
-      )
+      described_class.should_log?(message_level, desired_level)
     end
 
     describe 'Message level' do

@@ -44,10 +44,7 @@ module Alephant
       end
 
       def writeable?(message_level)
-        LevelsController.should_log?(
-          message_level: message_level,
-          desired_level: @write_level
-        )
+        LevelsController.should_log?(message_level, @write_level)
       end
 
       def flatten_values_to_s(hash)
